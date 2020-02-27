@@ -3,4 +3,4 @@ edu/shawnhamilton/advancedjava/StockService.class
 edu/shawnhamilton/advancedjava/StockServiceDemo.class
 edu/shawnhamilton/advancedjava/StockQuote.class
 edu/shawnhamilton/advancedjava/StockServiceFactory.class
-edu/shawnhamilton/advancedjava/App.class
+edu/shawnhamilton/advancedjava/BasicStockService$IntervalEnum.class
