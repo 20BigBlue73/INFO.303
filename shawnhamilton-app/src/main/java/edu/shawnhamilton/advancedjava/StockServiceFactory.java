@@ -8,7 +8,7 @@ public class StockServiceFactory {
 	
     public static StockService getStockService() {
     	
-    	return new BasicStockService();
+    	return new DatabaseStockService();
     }
     
 }

@@ -1,191 +1,138 @@
 package edu.shawnhamilton.advancedjava;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.ArrayList;
-import java.util.Arrays;
+import org.apache.http.annotation.Immutable;
+import javax.validation.constraints.NotNull;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import edu.shawnhamilton.advancedjava.StockQuote;
+import javax.validation.constraints.NotNull;
 
 public class BasicStockService implements StockService {
-	public enum IntervalEnum {
-		HOURLY, TWELVE_HOURS, DAILY, MONTHLY;
-	}
-	
-    public BasicStockService() {}
-    
-    public StockQuote getQuote(String tickerSymbol) {
-    	
-    	// Calendar testDate - hardwired variable used for testing first getQuote() method. 
-    	// It returns an instance of the current date and time.
-    	Calendar testDate = Calendar.getInstance();
-    	
-        // Handles test from StockServiceDemo for first getQuote() method
-        StockQuote sq = new StockQuote();
-        if (tickerSymbol.contentEquals("APPL")) {
-        	sq = new StockQuote(125.25, "APPL", testDate);
-        }
-        return sq;   	
-    }
-    
-    public List<StockQuote> getQuote(String tickerSymbol, Calendar fromDate, Calendar endDate, IntervalEnum interval) {
-    	
-    	// An array list to store the values retrieved from the source
-    	List<StockQuote> stocksRetrieved = new ArrayList<>();
-    	
-    	// For now, 4 different functions that create Array Lists (one for each interval)
-    	// are used to populate store, and retrieve the stock quote data based on the user's
-    	// choice of the interval, storing the data in the quotesListTemp variable.
-    	List<StockQuote> quotesTempList = new ArrayList<>();
-    	
-    	if (interval == BasicStockService.IntervalEnum.HOURLY) {
-            quotesTempList = createHourlyObjects();
-    	}
-    	else if( interval == BasicStockService.IntervalEnum.TWELVE_HOURS) {
-            quotesTempList = createTwelveHourObjects();
-    	}
-    	else if( interval == BasicStockService.IntervalEnum.DAILY) {
-            quotesTempList = createDailyObjects();
-    	}
-    	else if( interval == BasicStockService.IntervalEnum.MONTHLY) {
-            quotesTempList = createMonthlyObjects();
-    	}
-        
-    	// An enhanced for loop that compares the tickerSymbol, fromDate, and endDate 
-    	// variable values passed into our second getQuote() method, with the tickerSymbol
-    	// and date values for a given stock in the list. If the tickerSymbol cannot be 
-    	// found, the loop exits and a message is printed letting the user know.
-    	for (StockQuote quote : quotesTempList) {
-    		if ( ( quote.getTickerSymbol().equals(tickerSymbol) ) == false) {
-    			System.out.println("The system cannot locate the stock by the tickerSymbol");
-    			break;
-    		}
-    		// The line of code below is a fancy way of saying "If the date of the stock is
-    		// equal to or greater than the supplied fromDate, and the date of the stock is 
-    		// equal to or less than the supplied endDate, then add it to the new array list.
-    		if ( ( quote.getDate().equals(fromDate) || quote.getDate().after(fromDate) ) &&
-    				( quote.getDate().equals(endDate) || quote.getDate().before(endDate) ) ) {
-    		    stocksRetrieved.add(quote);
-    		}  		
-    	}
-        return stocksRetrieved;
-    } 
-    
-    // Below are 4 private helper methods that serve as our data sources. They each create
-    // a year's worth of Apple stock quotes at arbitrary prices (for now) at 4 different intervals;
-    // hourly, every 12 hours, daily, and monthly. The actual single data source chosen is specified
-    // with the help of the EnumInterval above.
-    
-    private List<StockQuote> createMonthlyObjects() { 
-    	
-    	List<StockQuote> monthlyStockHistory = new ArrayList<>(); 
-    	
-    	Calendar startDate = new GregorianCalendar();
-    	Calendar endDate = new GregorianCalendar();
-    	Calendar monthlyDate = new GregorianCalendar();
-    	
-    	double price = 100.34;
-    	
-    	startDate.set(2020, 0, 15);
-    	endDate.set(2020, 11, 15);
-    	
-    	while (startDate.before(endDate) || startDate.equals(endDate)) {
-    		// Variable that will be used to hold and populate the day values for a year of stocks.
-    		monthlyDate = (Calendar) startDate.clone(); 
-    	    // Add the stock to the list.
-    		monthlyStockHistory.add(new StockQuote(price, "APPL", monthlyDate)); 
-    	    // Increment the month by one.
-    	    startDate.add(Calendar.MONTH, 1);
-            //Increment the price
-    	    price = price + 50/1+2;
-    	 
-    	}
-    
-    	return monthlyStockHistory;
-    }
-    
-    private List<StockQuote> createTwelveHourObjects() { 
-    	
-    	List<StockQuote> twelveHourStockHistory = new ArrayList<>(); 
-    	
-    	Calendar startDate = new GregorianCalendar();
-    	Calendar endDate = new GregorianCalendar();
-    	Calendar twelveHourlyDate = new GregorianCalendar();
-    	
-    	double price = 100.34;
-    	
-    	startDate.set(2020, 0, 1);
-    	endDate.set(2020, 11, 31);
-    	
-    	while (startDate.before(endDate) || startDate.equals(endDate)) {
-    		// Variable that will be used to hold and populate the bi-daily values for a year of stocks.
-    		twelveHourlyDate = (Calendar) startDate.clone(); 
-    	    // Add the stock to the list.
-    		twelveHourStockHistory.add(new StockQuote(price, "APPL", twelveHourlyDate)); 
-    	    // Increment the hour by twelve.
-    	    startDate.add(Calendar.HOUR_OF_DAY, 12);
-            //Increment the price
-    	    price = price + 2;
-    	 
-    	    }
 
-    	    return twelveHourStockHistory;
-        }
-    
-    private List<StockQuote> createDailyObjects() { 
-    	
-    	List<StockQuote> dailyStockHistory = new ArrayList<>(); 
-    	
-    	Calendar startDate = new GregorianCalendar();
-    	Calendar endDate = new GregorianCalendar();
-    	Calendar dailyDate = new GregorianCalendar();
-    	
-    	double price = 100.34;
-    	
-    	startDate.set(2020, 0, 1);
-    	endDate.set(2020, 11, 31);
-    	
-    	while (startDate.before(endDate) || startDate.equals(endDate)) {
-    		// Variable that will be used to hold and populate the day values for a year of stocks.
-    		dailyDate = (Calendar) startDate.clone(); 
-    	    // Add the stock to the list.
-    		dailyStockHistory.add(new StockQuote(price, "APPL", dailyDate)); 
-    	    // Increment the day by one.
-    	    startDate.add(Calendar.DATE, 1);
-            //Increment the price
-    	    price = price + 4;
-    	 
-    	}
-    
-    	return dailyStockHistory;
+    /**
+     * No-arg constructor
+     * 
+     */
+    protected BasicStockService() {
     }
-    
-private List<StockQuote> createHourlyObjects() { 
-    	
-    	List<StockQuote> hourlyStockHistory = new ArrayList<>(); 
-    	
-    	Calendar startDate = new GregorianCalendar();
-    	Calendar endDate = new GregorianCalendar();
-    	Calendar hourlyDate = new GregorianCalendar();
-    	
-    	double price = 100.34;
-    	
-    	startDate.set(2020, 0, 1);
-    	endDate.set(2020, 11, 31);
-    	
-    	while (startDate.before(endDate) || startDate.equals(endDate)) {
-    		// Variable that will be used to hold and populate the hour values for a year of stocks.
-    		hourlyDate = (Calendar) startDate.clone(); 
-    	    // Add the stock to the list.
-    		hourlyStockHistory.add(new StockQuote(price, "APPL", hourlyDate)); 
-    	    // Increment the hour by one.
-    	    startDate.add(Calendar.HOUR_OF_DAY, 1);
-            //Increment the price
-    	    price = price + .2;
-    	 
-    	}  
-    	return hourlyStockHistory;
+
+    /**
+     * Return the current price for a share of stock for the given symbol
+     * 
+     * @param tickerSymbol the stock symbol of the company you want a quote for.
+     *                     e.g. APPL for APPLE
+     *
+     * @return a <CODE>StockQuote </CODE> instance
+     */
+    public StockQuote getQuote(String tickerSymbol) {
+        return new StockQuote(450.23, "APPL", Calendar.getInstance());
+    }
+
+    public List<StockQuote> getQuote(@NotNull String symbol, @NotNull Calendar startDate, @NotNull Calendar endDate, @NotNull String interval) {
+
+        // I'm calling a private helper method to create some StockQuote objects in
+        // order to keep the
+        // getQuote method uncluttered. When I have a real data source, I won't need the
+        // helper method.
+        List<StockQuote> tmpObjects = createObjects();
+
+        // Create an empty list to store the results in
+        List<StockQuote> stockHistory = new ArrayList<>();
+
+        // Return just the StockQuote objects that fall between the start and end dates,
+        // using the specified interval
+        long intervalvalue = IntervalEnum.getInterval(interval);
+        for (StockQuote quote : tmpObjects) {
+            if ((quote.getDate().getTimeInMillis() >= startDate.getTimeInMillis())
+                    && (quote.getDate().getTimeInMillis() <= endDate.getTimeInMillis())) {
+                stockHistory.add(quote);
+            }
+        }
+        return stockHistory;
+    }
+
+    /**
+     * I could have made this a separate top level enum but since it's tightly
+     * coupled to the stock service app, I decided to put it inside the stock
+     * service implementation. I also decided to keep the implementation simplh by
+     * supplying a static initialization block which will be executed once when the
+     * enum is loaded.
+     *
+     */
+    enum IntervalEnum {
+
+        DAILY, WEEKLY, MONTHLY, YEARLY;
+
+        private final static Map<IntervalEnum, Integer> intervalValue = new HashMap<>();
+
+        static {
+            intervalValue.put(DAILY, 1);
+            intervalValue.put(WEEKLY, 7);
+            intervalValue.put(MONTHLY, 30);
+            intervalValue.put(YEARLY, 365);
+        }
+
+        private IntervalEnum() {
+        }
+
+        /**
+         *
+         * @return the interval value 86400000 is the number of milliseconds in a day To
+         *         find 30 days, multiply by 30 To find 1 year, multiply by 365
+         */
+        public static long getInterval(String p_value) {
+            IntervalEnum enumValue = IntervalEnum.valueOf(p_value);
+            long value = intervalValue.get(enumValue) * 86400000;
+            return value;
+        }
+        
+        /**
+         *
+         * @return the interval value as an integer for use in resultSet.relative()
+         * method for our sql query in the DatabaseStockService class
+         */
+        public static int queryInterval(String p_value) {
+            IntervalEnum enumValue = IntervalEnum.valueOf(p_value);
+            int value = intervalValue.get(enumValue);
+            return value;
+        }
+
+        /**
+         * @override
+         * @return the interval string
+         */
+        public String toString(IntervalEnum value) {
+            return value.toString();
+        }
+    }
+
+    /**
+     * Temporary private helper method to a stock history
+     * 
+     * @return List<StockQuote>
+     */
+    private List<StockQuote> createObjects() {
+        List<StockQuote> stockHistory = new ArrayList<>();
+        int year = 2015;
+        int month = 1;
+        int day = 1;
+        double price = 100.34;
+        for (int i = year; i < 2020; i++) {
+            for (int j = month; j < 12; j++) {
+                for (int k = day; k < 30; k++) {
+                    Calendar date = new GregorianCalendar(i, j, k);
+                    stockHistory.add(new StockQuote(price, "APPL", date));
+                    price = price + 50 / 1 + 2;
+                }
+            }
+        }
+
+        return stockHistory;
     }
 
 }
